@@ -38,46 +38,26 @@ background = cv2.cvtColor(background, cv2.COLOR_BGR2GRAY)
 canvas_background, contours_background = contours_detector.work(background)
 
 while True:
-    # Capture frame-by-frame
     ret, frame = cap.read()
-
-    # resizing for faster detection
-    # original_frame = cv2.resize(original_frame, (640, 480))
-    # using a greyscale picture, also for faster detection
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    # segmentation via classical MOG2
-    segment = subtractor.work(gray)
-
-    # compute difference between foreground and background contours
-    canvas_gray, contours_gray = contours_detector.work(gray)
-    diff = cv2.subtract(canvas_gray, canvas_background)
-
-    diff_contours = np.delete(
-        contours_gray, np.argwhere(np.isin(contours_gray, contours_background))
+    segmented = subtractor.work(gray)
+    canvas_segmented, contours_segmented = contours_detector.work(
+        segmented, mode=cv2.RETR_LIST
     )
 
-    # draw bounding boxes around previously found contours
-    draw_bounding_boxes(frame, diff_contours, (0, 255, 0), 200, len(frame) ** 2 / 2)
+    diff = cv2.subtract(canvas_segmented, canvas_background)
+    diff_contours = np.copy(contours_segmented)
 
-    # draw bounding boxes from MOG2
-    _, segment_contours = contours_detector.work(segment)
-    draw_bounding_boxes(frame, segment_contours, (0, 0, 255), 200, len(frame) ** 2 / 2)
+    # remove common contours
+    for contour in contours_background:
+        if np.any(np.isin(contour, diff_contours)):
+            np.delete(diff_contours, contour)
 
-    # returns the bounding boxes for the detected objects
-    # boxes, weights = hog.detectMultiScale(original_frame, winStride=(8, 8))
+    draw_bounding_boxes(frame, diff_contours, (0, 255, 0), 200)
 
-    # boxes = np.array([[x, y, x + w, y + h] for (x, y, w, h) in boxes])
-
-    # for (xA, yA, xB, yB) in boxes:
-    #     # display the detected boxes in the colour picture
-    #     cv2.rectangle(original_frame, (xA, yA), (xB, yB), (0, 255, 0), 2)
-
-    # Write the output video
-    # out.write(original_frame.astype("uint8"))
-    # Display the resulting frame
     cv2.imshow("frame", frame)
-    cv2.resizeWindow("frame", 1920, 720)
+    # cv2.resizeWindow("frame", 1920, 720)
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 

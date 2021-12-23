@@ -1,7 +1,7 @@
 import cv2
 
 
-def draw_bounding_boxes(frame, contours, colors, min_size, max_size):
+def draw_bounding_boxes(frame, contours, colors, min_size=None, max_size=None):
     for contour in contours:
         if min_size is not None and cv2.contourArea(contour) < min_size:
             continue

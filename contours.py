@@ -9,13 +9,13 @@ class CountoursDetector:
         self.maxval = maxval
         self.type = type
 
-    def work(self, frame):
+    def work(self, frame, mode=cv2.RETR_EXTERNAL):
         # frame_grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         _, thresh = cv2.threshold(frame, self.threshold, self.maxval, self.type)
 
         # detect the contours on the binary image using cv2.CHAIN_APPROX_NONE
         contours, _ = cv2.findContours(
-            image=thresh, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_SIMPLE
+            image=thresh, mode=mode, method=cv2.CHAIN_APPROX_NONE
         )
 
         canvas = np.zeros((len(frame), len(frame[0]), 3), np.uint8)
