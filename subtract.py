@@ -1,12 +1,10 @@
-import sys
-import numpy as np
 import cv2
 
 
 class BackgroundSubtractor:
     def __init__(self):
         self.subtractor = cv2.createBackgroundSubtractorMOG2(
-            detectShadows=True, history=None
+            detectShadows=True, history=0, varThreshold=None
         )
 
     def work(self, frame):
