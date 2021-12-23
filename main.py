@@ -56,6 +56,10 @@ while True:
 
     draw_bounding_boxes(frame, diff_contours, (0, 255, 0), 200)
 
+    ## Start HOG-SVM
+    boxes, weights = hog.detectMultiScale(frame, winStride=(8, 8))
+    draw_hog_bounding_boxes(frame, boxes, (255, 0, 0))
+
     cv2.imshow("frame", frame)
     # cv2.resizeWindow("frame", 1920, 720)
     if cv2.waitKey(1) & 0xFF == ord("q"):
