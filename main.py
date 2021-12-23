@@ -1,5 +1,4 @@
 # import the necessary packages
-import sys
 import argparse
 import numpy as np
 import cv2
@@ -24,26 +23,26 @@ hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
 cv2.startWindowThread()
 
-# open webcam video stream
 cap = cv2.VideoCapture(args.input)
-
-# the output will be written to output.avi
-# out = cv2.VideoWriter("./output.avi", cv2.VideoWriter_fourcc(*"MJPG"), 15.0, (640, 480))
 
 subtractor = BackgroundSubtractor()
 contours_detector = CountoursDetector(50, 255, cv2.THRESH_BINARY)
 
 background = cv2.imread(args.background)
 background = cv2.cvtColor(background, cv2.COLOR_BGR2GRAY)
+background = cv2.resize(background, (350, 300))
 canvas_background, contours_background = contours_detector.work(background)
 
-while True:
-    ret, frame = cap.read()
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    segmented = subtractor.work(gray)
+def do_hog_svm():
+    boxes, weights = hog.detectMultiScale(frame, winStride=(8, 8))
+    draw_hog_bounding_boxes(frame, boxes, (255, 0, 0))
+
+
+def do_mog():
+    segmented = cv2.absdiff(gray, background)
     canvas_segmented, contours_segmented = contours_detector.work(
-        segmented, mode=cv2.RETR_LIST
+        segmented, mode=cv2.RETR_EXTERNAL, remove_shadows=True
     )
 
     diff = cv2.subtract(canvas_segmented, canvas_background)
@@ -52,23 +51,27 @@ while True:
     # remove common contours
     for contour in contours_background:
         if np.any(np.isin(contour, diff_contours)):
-            np.delete(diff_contours, contour)
+            try:
+                np.delete(diff_contours, contour)
+            except IndexError as error:
+                print(error)
 
     draw_bounding_boxes(frame, diff_contours, (0, 255, 0), 200)
 
-    ## Start HOG-SVM
-    boxes, weights = hog.detectMultiScale(frame, winStride=(8, 8))
-    draw_hog_bounding_boxes(frame, boxes, (255, 0, 0))
+
+while True:
+    ret, frame = cap.read()
+    frame = cv2.resize(frame, (350, 300))
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    do_hog_svm()
+    do_mog()
 
     cv2.imshow("frame", frame)
-    # cv2.resizeWindow("frame", 1920, 720)
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
-# When everything done, release the capture
+
 cap.release()
-# and release the output
-# out.release()
-# finally, close the window
 cv2.destroyAllWindows()
 cv2.waitKey(1)
