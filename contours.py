@@ -3,21 +3,30 @@ import cv2
 
 
 class CountoursDetector:
-    def __init__(self, threshold, maxval, type):
+    """
+    Class that packs techniques and parameters to perform contours detection
+    """
+
+    def __init__(self, threshold, maxval, threshold_type):
         self.threshold = threshold
         self.maxval = maxval
-        self.type = type
+        self.threshold_type = threshold_type
 
     def work(self, frame, mode=cv2.RETR_EXTERNAL, remove_shadows=False):
+        """
+        Method that starts contours detection with the configured parameters
+        """
         # frame_grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         if not remove_shadows:
-            _, thresh = cv2.threshold(frame, self.threshold, self.maxval, self.type)
+            _, thresholded = cv2.threshold(
+                frame, self.threshold, self.maxval, self.threshold_type
+            )
         else:
-            _, thresh = cv2.threshold(frame, 20, self.maxval, self.type)
+            _, thresholded = cv2.threshold(frame, 20, self.maxval, self.threshold_type)
 
         # detect the contours on the binary image using cv2.CHAIN_APPROX_NONE
         contours, _ = cv2.findContours(
-            image=thresh, mode=mode, method=cv2.CHAIN_APPROX_NONE
+            image=thresholded, mode=mode, method=cv2.CHAIN_APPROX_NONE
         )
 
         canvas = np.zeros((len(frame), len(frame[0]), 3), np.uint8)
