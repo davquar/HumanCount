@@ -42,7 +42,9 @@ class App:
         """
         Performs the HOG-SVM people detection on the current frame
         """
-        boxes, _ = self.hog.detectMultiScale(self.frame, winStride=(8, 8))
+        boxes, _ = self.hog.detectMultiScale(
+            self.frame, winStride=(4, 4), scale=1.05, padding=(4, 4)
+        )
         utils.draw_hog_bounding_boxes(self.frame, boxes, (255, 0, 0))
         return boxes
 
