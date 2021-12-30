@@ -70,7 +70,7 @@ class App:
                     print(error)
 
         # utils.draw_bounding_boxes(self.frame, diff_contours, (0, 255, 0), 200)
-        return diff_contours
+        return utils.normalize_small_boxes(diff_contours, 200, None)
 
     def start(self):
         """
@@ -89,6 +89,9 @@ class App:
 
             filtered_boxes = utils.filter_bounding_boxes(hog_boxes, small_boxes, 200)
             utils.draw_bounding_boxes(self.frame, filtered_boxes, (0, 255, 0))
+
+            avg = round((len(hog_boxes) + len(small_boxes)) / 2)
+            utils.write_people_count(self.frame, avg)
 
             cv2.imshow("frame", self.frame)
             if cv2.waitKey(1) & 0xFF == ord("q"):

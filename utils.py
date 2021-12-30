@@ -43,13 +43,10 @@ def normalize_small_boxes(contours, min_size, max_size):
     return ret
 
 
-def filter_bounding_boxes(
-    hog_boxes, small_boxes_contours, min_size=None, max_size=None
-):
+def filter_bounding_boxes(hog_boxes, small_boxes, min_size=None, max_size=None):
     """
     Utility function that maintains the bounding boxes that are inside the HOG ones
     """
-    small_boxes = normalize_small_boxes(small_boxes_contours, min_size, max_size)
 
     ret = []
     for hog_box in hog_boxes:
@@ -62,3 +59,17 @@ def filter_bounding_boxes(
             ):
                 ret.append(small_box)
     return ret
+
+
+def write_people_count(frame, count):
+    """
+    Utility function to write the current people count on the frame
+    """
+    cv2.putText(
+        frame,
+        f"People: {count}",
+        (5, 290),
+        cv2.FONT_HERSHEY_COMPLEX_SMALL,
+        0.8,
+        (255, 255, 255),
+    )
