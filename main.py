@@ -44,6 +44,7 @@ class App:
         """
         boxes, _ = self.hog.detectMultiScale(self.frame, winStride=(8, 8))
         utils.draw_hog_bounding_boxes(self.frame, boxes, (255, 0, 0))
+        return boxes
 
     def do_object_detection(self):
         """
@@ -66,7 +67,8 @@ class App:
                 except IndexError as error:
                     print(error)
 
-        utils.draw_bounding_boxes(self.frame, diff_contours, (0, 255, 0), 200)
+        # utils.draw_bounding_boxes(self.frame, diff_contours, (0, 255, 0), 200)
+        return diff_contours
 
     def start(self):
         """
@@ -80,8 +82,11 @@ class App:
             self.frame = cv2.resize(self.frame, (350, 300))
             self.gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
 
-            self.do_hog_svm()
-            self.do_object_detection()
+            hog_boxes = self.do_hog_svm()
+            small_boxes = self.do_object_detection()
+
+            filtered_boxes = utils.filter_bounding_boxes(hog_boxes, small_boxes, 200)
+            utils.draw_bounding_boxes(self.frame, filtered_boxes, (0, 255, 0))
 
             cv2.imshow("frame", self.frame)
             if cv2.waitKey(1) & 0xFF == ord("q"):
