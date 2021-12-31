@@ -154,10 +154,15 @@ def draw_distance_between_people(frame, distance_boxes, pers_height):
             cur_dir = point_direction(pers1_coord, pers2_coord)
             cur_x = round(pers1_coord[0] + cur_dist * 0.5 * math.cos(cur_dir))
             cur_y = round(pers1_coord[1] + cur_dist * 0.5 * -math.sin(cur_dir))
+
+            text_dist = "{:.1f}m".format(closer_dist)
+            text_size = cv2.getTextSize(text_dist, cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.6, None)[0]
+            text_off_x = round(-text_size[0] * 0.5)
+            text_off_y = round(-text_size[1] * 0.5)
             cv2.putText(
                 frame,
-                "{:.1f}m".format(closer_dist),
-                (cur_x, cur_y),
+                text_dist,
+                (cur_x + text_off_x, cur_y + text_off_y),
                 cv2.FONT_HERSHEY_COMPLEX_SMALL,
                 0.6,
                 (0, 0, 255),

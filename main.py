@@ -45,7 +45,6 @@ class App:
         boxes, _ = self.hog.detectMultiScale(
             self.frame, winStride=(4, 4), scale=1.05, padding=(4, 4)
         )
-        utils.draw_hog_bounding_boxes(self.frame, boxes, (255, 0, 0))
         return boxes
 
     def do_object_detection(self):
@@ -88,8 +87,9 @@ class App:
             small_boxes = self.do_object_detection()
 
             distance_boxes = utils.get_distance_to_camera(self.frame, small_boxes, 5.5, 15, 85)
-
             # filtered_boxes = utils.filter_bounding_boxes(hog_boxes, small_boxes, 200)
+
+            # utils.draw_hog_bounding_boxes(self.frame, hog_boxes, (255, 0, 0))
             # utils.draw_bounding_boxes(self.frame, filtered_boxes, (0, 255, 0))
             utils.draw_bounding_boxes(self.frame, small_boxes, (0, 255, 0))
 
