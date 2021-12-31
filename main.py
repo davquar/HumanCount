@@ -87,11 +87,20 @@ class App:
             hog_boxes = self.do_hog_svm()
             small_boxes = self.do_object_detection()
 
-            filtered_boxes = utils.filter_bounding_boxes(hog_boxes, small_boxes, 200)
-            utils.draw_bounding_boxes(self.frame, filtered_boxes, (0, 255, 0))
+            distance_boxes = utils.get_distance_to_camera(self.frame, small_boxes, 5.5, 15, 85)
+
+            # filtered_boxes = utils.filter_bounding_boxes(hog_boxes, small_boxes, 200)
+            # utils.draw_bounding_boxes(self.frame, filtered_boxes, (0, 255, 0))
+            utils.draw_bounding_boxes(self.frame, small_boxes, (0, 255, 0))
 
             avg = round((len(hog_boxes) + len(small_boxes)) / 2)
             utils.write_people_count(self.frame, avg)
+
+            # draw people distance to camera
+            # utils.draw_distance_to_camera(self.frame, distance_boxes)
+
+            # draw distances between people
+            utils.draw_distance_between_people(self.frame, distance_boxes, 1.70)
 
             cv2.imshow("frame", self.frame)
             if cv2.waitKey(1) & 0xFF == ord("q"):
