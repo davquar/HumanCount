@@ -140,11 +140,11 @@ class App:
                 self.darken_heatmap()
                 self.draw_heatmap(small_boxes)
 
-            cv2.imshow("frame", self.frame)
-            if cv2.waitKey(1) & 0xFF == ord("q"):
-                break
+            window_content = np.hstack(
+                (self.frame, cv2.cvtColor(self.heatmap, cv2.COLOR_GRAY2BGR))
+            )
+            cv2.imshow("Frame and heatmap", window_content)
 
-            cv2.imshow("heatmap", self.heatmap)
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
 
