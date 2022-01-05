@@ -86,11 +86,13 @@ class App:
             hog_boxes = self.do_hog_svm()
             small_boxes = self.do_object_detection()
 
-            distance_boxes = utils.get_distance_to_camera(self.frame, small_boxes, 5.5, 15, 85)
-            # filtered_boxes = utils.filter_bounding_boxes(hog_boxes, small_boxes, 200)
+            filtered_boxes = utils.filter_bounding_boxes(hog_boxes, small_boxes, 200)
+            distance_boxes = utils.get_distance_to_camera(
+                self.frame, filtered_boxes, 5.5, 15, 85
+            )
 
-            # utils.draw_hog_bounding_boxes(self.frame, hog_boxes, (255, 0, 0))
-            # utils.draw_bounding_boxes(self.frame, filtered_boxes, (0, 255, 0))
+            utils.draw_hog_bounding_boxes(self.frame, hog_boxes, (255, 0, 0))
+            utils.draw_bounding_boxes(self.frame, filtered_boxes, (0, 255, 0))
             utils.draw_bounding_boxes(self.frame, small_boxes, (0, 255, 0))
 
             avg = round((len(hog_boxes) + len(small_boxes)) / 2)
