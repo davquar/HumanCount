@@ -33,9 +33,10 @@ class App:
             self.background
         )
 
-        # Initialize current frame holders (colored and grayscale)
+        # Initialize current frame holders (colored, grayscale, heatmap)
         self.frame = None
         self.gray = None
+        self.heatmap = np.zeros_like(self.background, dtype=np.uint8)
 
     def do_hog_svm(self):
         """
@@ -70,10 +71,29 @@ class App:
         # utils.draw_bounding_boxes(self.frame, diff_contours, (0, 255, 0), 200)
         return utils.normalize_small_boxes(diff_contours, 200, None)
 
+    def draw_heatmap(self, hog_boxes):
+        """
+        Draws a heatmap based on the boxes that are given in input
+        """
+        for box in hog_boxes:
+            x, y, w, h = box
+            sub_img = self.heatmap[y : y + h, x : x + w]
+            white_rect = np.ones(sub_img.shape, dtype=np.uint8) * 255
+            res = cv2.addWeighted(sub_img, 1, white_rect, 0.05, 0)
+            self.heatmap[y : y + h, x : x + w] = res
+
+    def darken_heatmap(self):
+        """
+        Puts a shade of black on top of the current heatmap
+        """
+        black_overlay = np.zeros_like(self.heatmap, dtype=np.uint8)
+        self.heatmap = cv2.addWeighted(self.heatmap, 0.9, black_overlay, 0.5, 0)
+
     def start(self):
         """
         Holds the main loop for HOG+SVM and object detection on each frame
         """
+        frame_counter = 0
         while True:
             read, self.frame = self.cap.read()
             if not read:
@@ -116,9 +136,19 @@ class App:
 
             utils.write_average_people_distance(self.frame, average_distance)
 
+            if frame_counter % 10 == 0:
+                self.darken_heatmap()
+                self.draw_heatmap(small_boxes)
+
             cv2.imshow("frame", self.frame)
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
+
+            cv2.imshow("heatmap", self.heatmap)
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                break
+
+            frame_counter += 1
 
         self.cap.release()
         cv2.destroyAllWindows()
