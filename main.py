@@ -1,7 +1,6 @@
 import argparse
 import numpy as np
 import cv2
-
 from subtract import BackgroundSubtractor
 from contours import CountoursDetector
 import utils
@@ -106,7 +105,16 @@ class App:
             # utils.draw_distance_to_camera(self.frame, distance_boxes)
 
             # draw distances between people
-            utils.draw_distance_between_people(self.frame, distance_boxes, 1.70)
+            distances = utils.draw_distance_between_people(
+                self.frame, distance_boxes, 1.70
+            )
+
+            # draw average distance between people
+            average_distance = 0
+            if len(distances) > 0:
+                average_distance = round(sum(distances) / (len(distances)), 1)
+
+            utils.write_average_people_distance(self.frame, average_distance)
 
             cv2.imshow("frame", self.frame)
             if cv2.waitKey(1) & 0xFF == ord("q"):

@@ -71,6 +71,20 @@ def write_people_count(frame, count):
     cv2.putText(
         frame,
         f"People: {count}",
+        (5, 270),
+        cv2.FONT_HERSHEY_COMPLEX_SMALL,
+        0.8,
+        (255, 255, 255),
+    )
+
+
+def write_average_people_distance(frame, value):
+    """
+    Utility function to write the average distance between people on the frame
+    """
+    cv2.putText(
+        frame,
+        f"Avg. dist.: {value}m",
         (5, 290),
         cv2.FONT_HERSHEY_COMPLEX_SMALL,
         0.8,
@@ -120,11 +134,18 @@ def draw_distance_to_camera(frame, distance_boxes):
 
 
 def draw_distance_between_people(frame, distance_boxes, pers_height):
+    distances = []
+    visited = []
+
     for dist_box1 in distance_boxes:
         closer_box = None
         closer_dist = None
         for dist_box2 in distance_boxes:
-            if dist_box1 != dist_box2:
+            not_visited = (dist_box1, dist_box2) not in visited and (
+                dist_box2,
+                dist_box1,
+            ) not in visited
+            if dist_box1 != dist_box2 and not_visited:
                 pers1_x = dist_box1[0][0] + dist_box1[0][2] * 0.5
                 pers2_x = dist_box2[0][0] + dist_box2[0][2] * 0.5
 
@@ -139,10 +160,13 @@ def draw_distance_between_people(frame, distance_boxes, pers_height):
                 c2 = (dist1_w_m + dist2_w_m) * 0.5
 
                 dist_m = math.sqrt(c1 * c1 + c2 * c2)
+                distances.append(dist_m)
 
                 if closer_box is None or dist_m < closer_dist:
                     closer_box = dist_box2
                     closer_dist = dist_m
+
+                visited.append((dist_box1, dist_box2))
 
         if closer_box is not None:
             pers1_coord = (
@@ -174,6 +198,7 @@ def draw_distance_between_people(frame, distance_boxes, pers_height):
                 0.6,
                 (0, 0, 255),
             )
+    return distances
 
 
 def read_input_json(path: str) -> dict:
