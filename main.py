@@ -14,7 +14,7 @@ class App:
 
     def __init__(self):
         cv2.startWindowThread()
-        self.cap = cv2.VideoCapture(args.input)
+        self.cap = cv2.VideoCapture(conf["video"])
 
         # Initialize HOG and SVM for people detection
         self.hog = cv2.HOGDescriptor()
@@ -25,7 +25,7 @@ class App:
         self.contours_detector = CountoursDetector(50, 255, cv2.THRESH_BINARY)
 
         # Read the still background (given in input)
-        self.background = cv2.imread(args.background)
+        self.background = cv2.imread(conf["background"])
         self.background = cv2.cvtColor(self.background, cv2.COLOR_BGR2GRAY)
         self.background = cv2.resize(self.background, (350, 300))
 
@@ -88,7 +88,11 @@ class App:
 
             filtered_boxes = utils.filter_bounding_boxes(hog_boxes, small_boxes, 200)
             distance_boxes = utils.get_distance_to_camera(
-                self.frame, filtered_boxes, 5.5, 15, 85
+                self.frame,
+                filtered_boxes,
+                conf["camera_conf"]["height"],
+                conf["camera_conf"]["lower_angle"],
+                conf["camera_conf"]["upper_angle"],
             )
 
             utils.draw_hog_bounding_boxes(self.frame, hog_boxes, (255, 0, 0))
@@ -115,14 +119,13 @@ class App:
 
 if __name__ == "__main__":
     argparse = argparse.ArgumentParser()
-    argparse.add_argument("-i", "--input", help="Input video", required=True)
-    argparse.add_argument(
-        "-b", "--background", help="Background of the current video", required=True
-    )
+    argparse.add_argument("-i", "--input", help="Input JSON", required=True)
     argparse.add_argument(
         "-s", "--show", help="Show the result in a window", action="store_true"
     )
     args = argparse.parse_args()
+
+    conf = utils.read_input_json(args.input)
 
     app = App()
     app.start()

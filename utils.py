@@ -1,5 +1,6 @@
 import math
-
+import json
+import os
 import cv2
 import numpy as np
 
@@ -84,7 +85,7 @@ def degree_to_radians(deg):
 def point_distance(p1, p2):
     c1 = abs(p1[0] - p2[0])
     c2 = abs(p1[1] - p2[1])
-    return math.sqrt(c1*c1 + c2*c2)
+    return math.sqrt(c1 * c1 + c2 * c2)
 
 
 def point_direction(p1, p2):
@@ -137,17 +138,21 @@ def draw_distance_between_people(frame, distance_boxes, pers_height):
                 c1 = abs(dist_box1[1] - dist_box2[1])
                 c2 = (dist1_w_m + dist2_w_m) * 0.5
 
-                dist_m = math.sqrt(c1*c1 + c2*c2)
+                dist_m = math.sqrt(c1 * c1 + c2 * c2)
 
                 if closer_box is None or dist_m < closer_dist:
                     closer_box = dist_box2
                     closer_dist = dist_m
 
         if closer_box is not None:
-            pers1_coord = (round(dist_box1[0][0] + dist_box1[0][2] * 0.5),
-                           round(dist_box1[0][1] + dist_box1[0][3]))
-            pers2_coord = (round(closer_box[0][0] + closer_box[0][2] * 0.5),
-                           round(closer_box[0][1] + closer_box[0][3]))
+            pers1_coord = (
+                round(dist_box1[0][0] + dist_box1[0][2] * 0.5),
+                round(dist_box1[0][1] + dist_box1[0][3]),
+            )
+            pers2_coord = (
+                round(closer_box[0][0] + closer_box[0][2] * 0.5),
+                round(closer_box[0][1] + closer_box[0][3]),
+            )
             cv2.line(frame, pers1_coord, pers2_coord, (255, 255, 255), 1)
 
             cur_dist = point_distance(pers1_coord, pers2_coord)
@@ -156,7 +161,9 @@ def draw_distance_between_people(frame, distance_boxes, pers_height):
             cur_y = round(pers1_coord[1] + cur_dist * 0.5 * -math.sin(cur_dir))
 
             text_dist = "{:.1f}m".format(closer_dist)
-            text_size = cv2.getTextSize(text_dist, cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.6, None)[0]
+            text_size = cv2.getTextSize(
+                text_dist, cv2.FONT_HERSHEY_COMPLEX_SMALL, 0.6, None
+            )[0]
             text_off_x = round(-text_size[0] * 0.5)
             text_off_y = round(-text_size[1] * 0.5)
             cv2.putText(
@@ -168,3 +175,13 @@ def draw_distance_between_people(frame, distance_boxes, pers_height):
                 (0, 0, 255),
             )
 
+
+def read_input_json(path: str) -> dict:
+    conf = {}
+    with open(path, "r") as f:
+        conf = json.load(f)
+
+    path_to_prepend = os.path.dirname(path) + "/"
+    conf["video"] = path_to_prepend + conf["video"]
+    conf["background"] = path_to_prepend + conf["background"]
+    return conf
