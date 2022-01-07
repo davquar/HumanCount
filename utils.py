@@ -145,7 +145,7 @@ def draw_distance_between_people(frame, distance_boxes, pers_height):
                 dist_box2,
                 dist_box1,
             ) not in visited
-            if dist_box1 != dist_box2 and not_visited:
+            if dist_box1 != dist_box2:
                 pers1_x = dist_box1[0][0] + dist_box1[0][2] * 0.5
                 pers2_x = dist_box2[0][0] + dist_box2[0][2] * 0.5
 
@@ -160,7 +160,9 @@ def draw_distance_between_people(frame, distance_boxes, pers_height):
                 c2 = (dist1_w_m + dist2_w_m) * 0.5
 
                 dist_m = math.sqrt(c1 * c1 + c2 * c2)
-                distances.append(dist_m)
+
+                if not_visited:
+                    distances.append(dist_m)
 
                 if closer_box is None or dist_m < closer_dist:
                     closer_box = dist_box2
