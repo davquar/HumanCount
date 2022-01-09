@@ -1,33 +1,29 @@
-import sys
 import argparse
 import numpy as np
 import cv2
-from skimage import data, filters
 
 argparse = argparse.ArgumentParser()
 argparse.add_argument("-i", "--input", help="Input video", required=True)
 argparse.add_argument("-o", "--output", help="Output path (image)", required=True)
-argparse.add_argument("-s", "--show", help="Show the result in a window", action="store_true")
+argparse.add_argument(
+    "-s", "--show", help="Show the result in a window", action="store_true"
+)
 args = argparse.parse_args()
 
-# Open Video
 cap = cv2.VideoCapture(args.input)
 
-# Randomly select 25 frames
-frameIds = cap.get(cv2.CAP_PROP_FRAME_COUNT) * np.random.uniform(size=100)
-
-# Store selected frames in an array
+# The median frame computation is based on 100 random frames
+frame_ids = cap.get(cv2.CAP_PROP_FRAME_COUNT) * np.random.uniform(size=100)
 frames = []
-for fid in frameIds:
-    cap.set(cv2.CAP_PROP_POS_FRAMES, fid)
-    ret, frame = cap.read()
+for frame_id in frame_ids:
+    cap.set(cv2.CAP_PROP_POS_FRAMES, frame_id)
+    _, frame = cap.read()
     frames.append(frame)
 
-# Calculate the median along the time axis
-medianFrame = np.median(frames, axis=0).astype(dtype=np.uint8)    
+median_frame = np.median(frames, axis=0).astype(dtype=np.uint8)
 
-cv2.imwrite(args.output, medianFrame)
+cv2.imwrite(args.output, median_frame)
 
 if args.show:
-    cv2.imshow('frame', medianFrame)
+    cv2.imshow("frame", median_frame)
     cv2.waitKey(0)
