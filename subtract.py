@@ -8,7 +8,7 @@ class BackgroundSubtractor:
 
     def __init__(self):
         self.subtractor = cv2.createBackgroundSubtractorMOG2(
-            detectShadows=True, history=0, varThreshold=None
+            detectShadows=True, history=10, varThreshold=10
         )
 
     def work(self, frame):

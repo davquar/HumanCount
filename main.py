@@ -47,15 +47,21 @@ class App:
         )
         return boxes
 
-    def do_object_detection(self):
+    def do_object_detection(self, use_mog2=False):
         """
         Performs the generic object detection on the current frame,
         by combining segmentation and contours detection
         """
-        segmented = cv2.absdiff(self.gray, self.background)
+        if use_mog2:
+            segmented = self.subtractor.work(self.gray)
+        else:
+            segmented = cv2.absdiff(self.gray, self.background)
+        cv2.imshow("segmented", segmented)
+
         canvas_segmented, contours_segmented = self.contours_detector.work(
             segmented, mode=cv2.RETR_EXTERNAL, remove_shadows=True
         )
+        cv2.imshow("contours", canvas_segmented)
 
         # diff = cv2.subtract(canvas_segmented, self.canvas_background)
         diff_contours = np.array(contours_segmented, copy=True, dtype=object)
@@ -103,7 +109,7 @@ class App:
             self.gray = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
 
             hog_boxes = self.do_hog_svm()
-            small_boxes = self.do_object_detection()
+            small_boxes = self.do_object_detection(use_mog2=args.use_mog2)
 
             filtered_boxes = utils.filter_bounding_boxes(hog_boxes, small_boxes, 200)
             distance_boxes = utils.get_distance_to_camera(
@@ -158,6 +164,12 @@ class App:
 if __name__ == "__main__":
     argparse = argparse.ArgumentParser()
     argparse.add_argument("-i", "--input", help="Input JSON", required=True)
+    argparse.add_argument(
+        "-m",
+        "--use-mog2",
+        help="Use MOG2 to perform background subtraction",
+        action="store_true",
+    )
     argparse.add_argument(
         "-s", "--show", help="Show the result in a window", action="store_true"
     )
