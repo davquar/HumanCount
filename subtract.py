@@ -8,11 +8,13 @@ class BackgroundSubtractor:
 
     def __init__(self):
         self.subtractor = cv2.createBackgroundSubtractorMOG2(
-            detectShadows=True, history=10, varThreshold=10
+            detectShadows=True, history=100, varThreshold=50
         )
+        self.subtractor.setNMixtures(5)
 
     def work(self, frame):
         """
         Method that starts MOG2 background subtraction with the configured parameters
         """
-        return self.subtractor.apply(frame)
+        self.subtractor.apply(frame)
+        return self.subtractor.getBackgroundImage()

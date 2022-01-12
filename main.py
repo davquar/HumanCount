@@ -53,15 +53,13 @@ class App:
         by combining segmentation and contours detection
         """
         if use_mog2:
-            segmented = self.subtractor.work(self.gray)
-        else:
-            segmented = cv2.absdiff(self.gray, self.background)
-        cv2.imshow("segmented", segmented)
+            self.background = self.subtractor.work(self.gray)
+
+        segmented = cv2.absdiff(self.gray, self.background)
 
         canvas_segmented, contours_segmented = self.contours_detector.work(
             segmented, mode=cv2.RETR_EXTERNAL, remove_shadows=True
         )
-        cv2.imshow("contours", canvas_segmented)
 
         # diff = cv2.subtract(canvas_segmented, self.canvas_background)
         diff_contours = np.array(contours_segmented, copy=True, dtype=object)
