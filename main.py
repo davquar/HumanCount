@@ -118,9 +118,13 @@ class App:
                 conf["camera_conf"]["upper_angle"],
             )
 
-            utils.draw_hog_bounding_boxes(self.frame, hog_boxes, (255, 0, 0))
-            utils.draw_bounding_boxes(self.frame, filtered_boxes, (0, 255, 0))
-            utils.draw_bounding_boxes(self.frame, small_boxes, (0, 255, 0))
+            if args.show_hog_boxes:
+                utils.draw_hog_bounding_boxes(self.frame, hog_boxes, (255, 0, 0))
+            
+            if args.no_filter_optimized_boxes:
+                utils.draw_bounding_boxes(self.frame, small_boxes, (0, 255, 0))
+            else:
+                utils.draw_bounding_boxes(self.frame, filtered_boxes, (0, 255, 0))
 
             avg = round((len(hog_boxes) + len(small_boxes)) / 2)
             utils.write_people_count(self.frame, avg)
@@ -162,6 +166,18 @@ class App:
 if __name__ == "__main__":
     argparse = argparse.ArgumentParser()
     argparse.add_argument("-i", "--input", help="Input JSON", required=True)
+    argparse.add_argument(
+        "-sh",
+        "--show-hog-boxes",
+        help="Show the bounding boxes produced by HOG-SVM",
+        action="store_true",
+    )
+    argparse.add_argument(
+        "-nf",
+        "--no-filter-optimized-boxes",
+        help="Also show the optimized bounding boxes that are outside the HOG-SVM ones",
+        action="store_true",
+    )
     argparse.add_argument(
         "-m",
         "--use-mog2",
