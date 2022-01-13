@@ -126,8 +126,7 @@ class App:
             else:
                 utils.draw_bounding_boxes(self.frame, filtered_boxes, (0, 255, 0))
 
-            avg = round((len(hog_boxes) + len(small_boxes)) / 2)
-            utils.write_people_count(self.frame, avg)
+            utils.write_people_count(self.frame, len(hog_boxes))
 
             # draw people distance to camera
             # utils.draw_distance_to_camera(self.frame, distance_boxes)
