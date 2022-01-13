@@ -120,7 +120,7 @@ class App:
 
             if args.show_hog_boxes:
                 utils.draw_hog_bounding_boxes(self.frame, hog_boxes, (255, 0, 0))
-            
+
             if args.no_filter_optimized_boxes:
                 utils.draw_bounding_boxes(self.frame, small_boxes, (0, 255, 0))
             else:
@@ -134,7 +134,7 @@ class App:
 
             # draw distances between people
             distances = utils.draw_distance_between_people(
-                self.frame, distance_boxes, 1.70
+                self.frame, distance_boxes, 1.70, min_distance_allowed
             )
 
             # draw average distance between people
@@ -143,6 +143,26 @@ class App:
                 average_distance = round(sum(distances) / (len(distances)), 1)
 
             utils.write_average_people_distance(self.frame, average_distance)
+
+            # alarms
+            if not args.no_alarm_count:
+                people_count = len(hog_boxes)
+                if people_count > max_people_allowed:
+                    print(
+                        f"[People count alarm] Current: {people_count};\tmaximum allowed: {max_people_allowed}"
+                    )
+                    self.frame = cv2.circle(
+                        self.frame, (335, 265), 3, (0, 128, 255), 5
+                    )
+            if not args.no_alarm_distance and len(distances) > 0:
+                min_distance = min(distances)
+                if min_distance < min_distance_allowed:
+                    print(
+                        f"[People distance alarm] Found: {round(min_distance, 2)};\tminimum allowed: {min_distance_allowed}"
+                    )
+                    self.frame = cv2.circle(
+                        self.frame, (335, 285), 3, (0, 0, 255), 5
+                    )
 
             if frame_counter % 10 == 0:
                 self.darken_heatmap()
@@ -185,11 +205,25 @@ if __name__ == "__main__":
         action="store_true",
     )
     argparse.add_argument(
+        "-nac",
+        "--no-alarm-count",
+        help="Disable the alarm when the number of people exceedes the limit",
+        action="store_true",
+    )
+    argparse.add_argument(
+        "-nad",
+        "--no-alarm-distance",
+        help="Disable the alarm when there is a distance smaller that the minimum limit allowed",
+        action="store_true",
+    )
+    argparse.add_argument(
         "-s", "--show", help="Show the result in a window", action="store_true"
     )
     args = argparse.parse_args()
 
     conf = utils.read_input_json(args.input)
+    max_people_allowed = conf["alarms"]["max_people"]
+    min_distance_allowed = conf["alarms"]["min_distance"]
 
     app = App()
     app.start()

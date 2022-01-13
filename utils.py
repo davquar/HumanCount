@@ -133,7 +133,7 @@ def draw_distance_to_camera(frame, distance_boxes):
         )
 
 
-def draw_distance_between_people(frame, distance_boxes, pers_height):
+def draw_distance_between_people(frame, distance_boxes, pers_height, max_distance_allowed):
     distances = []
     visited = []
 
@@ -198,7 +198,7 @@ def draw_distance_between_people(frame, distance_boxes, pers_height):
                 (cur_x + text_off_x, cur_y + text_off_y),
                 cv2.FONT_HERSHEY_COMPLEX_SMALL,
                 0.6,
-                (0, 0, 255),
+                (0, 0, 255) if closer_dist < max_distance_allowed else (255, 255, 255),
             )
     return distances
 
