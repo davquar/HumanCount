@@ -61,7 +61,10 @@ class App:
             segmented, mode=cv2.RETR_EXTERNAL, remove_shadows=True
         )
 
-        # diff = cv2.subtract(canvas_segmented, self.canvas_background)
+        if args.show:
+            cv2.imshow("segmented", segmented)
+            cv2.imshow("contours", canvas_segmented)
+
         diff_contours = np.array(contours_segmented, copy=True, dtype=object)
 
         # remove common contours
@@ -72,7 +75,6 @@ class App:
                 except IndexError as error:
                     print(error)
 
-        # utils.draw_bounding_boxes(self.frame, diff_contours, (0, 255, 0), 200)
         return utils.normalize_small_boxes(diff_contours, 200, None)
 
     def draw_heatmap(self, hog_boxes):
@@ -128,9 +130,6 @@ class App:
 
             utils.write_people_count(self.frame, len(hog_boxes))
 
-            # draw people distance to camera
-            # utils.draw_distance_to_camera(self.frame, distance_boxes)
-
             # draw distances between people
             distances = utils.draw_distance_between_people(
                 self.frame, distance_boxes, 1.70, min_distance_allowed
@@ -140,7 +139,6 @@ class App:
             average_distance = 0
             if len(distances) > 0:
                 average_distance = round(sum(distances) / (len(distances)), 1)
-
             utils.write_average_people_distance(self.frame, average_distance)
 
             # alarms
@@ -150,23 +148,20 @@ class App:
                     print(
                         f"[People count alarm] Current: {people_count};\tmaximum allowed: {max_people_allowed}"
                     )
-                    self.frame = cv2.circle(
-                        self.frame, (335, 265), 3, (0, 128, 255), 5
-                    )
+                    self.frame = cv2.circle(self.frame, (335, 265), 3, (0, 128, 255), 5)
             if not args.no_alarm_distance and len(distances) > 0:
                 min_distance = min(distances)
                 if min_distance < min_distance_allowed:
                     print(
                         f"[People distance alarm] Found: {round(min_distance, 2)};\tminimum allowed: {min_distance_allowed}"
                     )
-                    self.frame = cv2.circle(
-                        self.frame, (335, 285), 3, (0, 0, 255), 5
-                    )
+                    self.frame = cv2.circle(self.frame, (335, 285), 3, (0, 0, 255), 5)
 
             if frame_counter % 10 == 0:
                 self.darken_heatmap()
                 self.draw_heatmap(small_boxes)
 
+            # put the frame and the heatmap together horizontally
             window_content = np.hstack(
                 (self.frame, cv2.cvtColor(self.heatmap, cv2.COLOR_GRAY2BGR))
             )
@@ -216,7 +211,10 @@ if __name__ == "__main__":
         action="store_true",
     )
     argparse.add_argument(
-        "-s", "--show", help="Show the result in a window", action="store_true"
+        "-s",
+        "--show",
+        help="Show some intermediate preprocessing steps in a window",
+        action="store_true",
     )
     args = argparse.parse_args()
 

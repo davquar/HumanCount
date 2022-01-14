@@ -16,7 +16,6 @@ class CountoursDetector:
         """
         Method that starts contours detection with the configured parameters
         """
-        # frame_grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         if not remove_shadows:
             _, thresholded = cv2.threshold(
                 frame, self.threshold, self.maxval, self.threshold_type
@@ -24,11 +23,11 @@ class CountoursDetector:
         else:
             _, thresholded = cv2.threshold(frame, 20, self.maxval, self.threshold_type)
 
-        # detect the contours on the binary image using cv2.CHAIN_APPROX_NONE
         contours, _ = cv2.findContours(
             image=thresholded, mode=mode, method=cv2.CHAIN_APPROX_NONE
         )
 
+        # prepare black frame
         canvas = np.zeros((len(frame), len(frame[0]), 3), np.uint8)
 
         # draw contours on the original image

@@ -50,7 +50,6 @@ def filter_bounding_boxes(hog_boxes, small_boxes, min_size=None, max_size=None):
     """
     Utility function that maintains the bounding boxes that are inside the HOG ones
     """
-
     ret = []
     for hog_box in hog_boxes:
         for small_box in small_boxes:
@@ -93,22 +92,35 @@ def write_average_people_distance(frame, value):
 
 
 def degree_to_radians(deg):
+    """
+    Converts the given degrees to radians
+    """
     return deg * math.pi / 180
 
 
 def point_distance(p1, p2):
+    """
+    Calculates the distance between two points, using the Pythagorean's theorem
+    """
     c1 = abs(p1[0] - p2[0])
     c2 = abs(p1[1] - p2[1])
     return math.sqrt(c1 * c1 + c2 * c2)
 
 
 def point_direction(p1, p2):
+    """
+    Calculates the angle relative to the ground (x axis)
+    """
     delta_x = p2[0] - p1[0]  # p2.x - p1.x
     delta_y = p1[1] - p2[1]  # p1.y - p2.y
     return math.atan2(delta_y, delta_x)
 
 
 def get_distance_to_camera(frame, boxes, cam_height, cam_min_angle, cam_max_angle):
+    """
+    Returns the estimated distance between the each bounding box and the camera,
+    using the given configuration parameters.
+    """
     distance_boxes = []
     for box in boxes:
         diff_angle = cam_max_angle - cam_min_angle
@@ -120,6 +132,9 @@ def get_distance_to_camera(frame, boxes, cam_height, cam_min_angle, cam_max_angl
 
 
 def draw_distance_to_camera(frame, distance_boxes):
+    """
+    Draws the distance between each box and the camera, on the current frame
+    """
     for dist_box in distance_boxes:
         box, dist = dist_box
 
@@ -133,7 +148,12 @@ def draw_distance_to_camera(frame, distance_boxes):
         )
 
 
-def draw_distance_between_people(frame, distance_boxes, pers_height, max_distance_allowed):
+def draw_distance_between_people(
+    frame, distance_boxes, pers_height, max_distance_allowed
+):
+    """
+    Draws the minimum distance between each pair of bounding boxes, on the current frame
+    """
     distances = []
     visited = []
 
@@ -204,6 +224,9 @@ def draw_distance_between_people(frame, distance_boxes, pers_height, max_distanc
 
 
 def read_input_json(path: str) -> dict:
+    """
+    Loads the JSON configuration from the given input file
+    """
     conf = {}
     with open(path, "r") as f:
         conf = json.load(f)
