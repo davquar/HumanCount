@@ -1,0 +1,13 @@
+{
+    "video": "5.mp4",
+    "background": "5.png",
+    "camera_conf": {
+        "height": 2.0,
+        "lower_angle": 55,
+        "upper_angle": 100
+    },
+    "alarms": {
+        "max_people": 4,
+        "min_distance": 1
+    }
+}
