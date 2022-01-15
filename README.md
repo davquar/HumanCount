@@ -2,6 +2,8 @@
 
 This repository contains the final project's code for the **Computer Vision** course at Sapienza University of Rome (A.Y. 2021-22).
 
+By [Davide Quaranta](https://github.com/fortym2/), [Davide Modenese](https://github.com/EatingLupini), [Federico Cernera](https://github.com/fedecerno).
+
 ![img](docs/main_screen.png)
 
 The project does **real-time human counting** using HOG and SVM, and it is intended to be used to **monitor a known area**. In addition to counting, the program:
@@ -12,7 +14,7 @@ The project does **real-time human counting** using HOG and SVM, and it is inten
   * The minimum distance between people is less than the minimum allowed.
 * Shows an evolving **heat-map**, to describe the density of the people over certain areas, over time.
 
-The main goal of the project was to improve the size of the bounding boxes, also in order to give better distance estimations. To reach this goal, the approaches described in the paper **Human Detection Using HOG-SVM, Mixture of Gaussian and Background Contours Subtraction** by *A. H. Ahmed, K. Kpalma and A. O. Guedi* has been used as a reference.
+In order to give better distance estimations, we needed to improve the size of the bounding boxes. To reach this goal, the approaches described in the paper **Human Detection Using HOG-SVM, Mixture of Gaussian and Background Contours Subtraction** by *A. H. Ahmed, K. Kpalma and A. O. Guedi* has been used as a reference.
 
 *A. H. Ahmed, K. Kpalma and A. O. Guedi, "[Human Detection Using HOG-SVM, Mixture of Gaussian and Background Contours Subtraction](https://ieeexplore.ieee.org/document/8334767/)," 2017 13th International Conference on Signal-Image Technology & Internet-Based Systems (SITIS), 2017, pp. 334-338, doi: 10.1109/SITIS.2017.62.*
 
@@ -47,6 +49,8 @@ optional arguments:
 ```
 
 By default, the script looks for the still `background` image provided in the input JSON; alternatively, if the `--use-mog2` option is provided, the background will be extracted in real-time for each frame.
+
+The background image and the video to use must be in the **same directory** as the JSON file.
 
 ### JSON configuration
 
@@ -107,6 +111,6 @@ python3 main.py -i datasets/8.json --show-hog-boxes --show
 
 ### Terminal output
 
-In case of alarms, in addition to the visual signals (colored circles in the right bottom, and colored distances), there is a terminal output that can be logged:
+In addition to the visual signals (colored circles in the right bottom, and colored distances), alarms are logged to `stdout`.
 
 ![image-20220114170403252](docs/terminal-alarms.png)
